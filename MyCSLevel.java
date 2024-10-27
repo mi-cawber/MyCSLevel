@@ -5,11 +5,15 @@ public class MyCSLevel {
         //Scanner object
         Scanner sc = new Scanner(System.in);
 
+
         //basic variables
-        int level = 50;
-        int totalHours = 0, inputHours;
-        double hoursToNextLevel, hoursNeeded;
+        double inputHours;
         double multiplier = 5.0;
+
+        //tracked, should be loaded in each runtime
+        int level = 1;
+        int totalHours = 0;
+        double hoursToNextLevel;
         double hoursThisLevel = 0;
 
 
@@ -18,20 +22,25 @@ public class MyCSLevel {
 
         //capture additional hours
         System.out.print("input hours: ");
-        inputHours = sc.nextInt();
+        inputHours = sc.nextDouble();
         //add to hours this level
         hoursThisLevel += inputHours;
+        //add to total count
+        totalHours += inputHours;
 
-        if (hoursThisLevel >= hoursToNextLevel) {
+        //level up decision structure
+        while (hoursThisLevel >= hoursToNextLevel) {
             level++;
-            hoursToNextLevel = 0;
-            System.out.printf("You have risen to %d", level);
-        } else {
-            System.out.printf("Hours needed %f", hoursToNextLevel - hoursThisLevel);
+            hoursThisLevel -=  hoursToNextLevel;
+            System.out.printf("You have risen to %d\n", level);
+            hoursToNextLevel = multiplier * Math.log(level + 1);
         }
 
+        //report next milestone
+        System.out.printf("%.1f hours needed to rise to level %d", hoursToNextLevel - hoursThisLevel, level + 1);
 
 
+        //write level, hoursToNext, totalHours to files
     }
 }
 
