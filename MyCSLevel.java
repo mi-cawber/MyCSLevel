@@ -1,9 +1,16 @@
 import java.util.Scanner;
+import java.io.*;
 
 public class MyCSLevel {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
         //Scanner object
         Scanner sc = new Scanner(System.in);
+
+        //reader to read different stuff?
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        
+        //new file writer for level
+        PrintWriter levelFile = new PrintWriter("level.txt");
 
 
         //basic variables
@@ -31,6 +38,8 @@ public class MyCSLevel {
         //level up decision structure
         while (hoursThisLevel >= hoursToNextLevel) {
             level++;
+            levelFile.println(level);
+            levelFile.close();
             hoursThisLevel -=  hoursToNextLevel;
             System.out.printf("You have risen to %d\n", level);
             hoursToNextLevel = multiplier * Math.log(level + 1);
