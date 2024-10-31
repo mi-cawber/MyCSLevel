@@ -3,7 +3,7 @@ import java.io.*;
 
 public class MyCSLevel {
     public static void main(String[] args)
-            throws IOException {
+            throws Exception {
         //Scanner object
         Scanner sc = new Scanner(System.in);
 
@@ -11,6 +11,8 @@ public class MyCSLevel {
         PrintWriter levelWriter = new PrintWriter(new FileWriter("level.txt", true));
         //now one for totalHours
         PrintWriter totalHoursWriter = new PrintWriter(new FileWriter("totalHours.txt", true));
+        //and one for hoursThisLevel
+        PrintWriter hoursThisLevelWriter = new PrintWriter(new FileWriter("hoursThisLevel.txt", true));
 
 
         //basic variables
@@ -19,8 +21,8 @@ public class MyCSLevel {
 
         //tracked, should be loaded in each runtime
         int level = 1; //this should be changed
-        int totalHours = 0; //should be changed
-        double hoursToNextLevel;
+        double totalHours = 0; //should be changed
+        double hoursToNextLevel = 0;
         double hoursThisLevel = 0;
 
 
@@ -57,42 +59,67 @@ public class MyCSLevel {
             }
 
             //convert the last line into int value for totalHours
-            totalHours = Integer.parseInt(totalHoursString);
+            totalHours = Double.parseDouble(totalHoursString);
 
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace(); // Handle any errors (file not found, invalid number)
         }
 
-        //the holy formula for leveling
+        //read hoursThisLevel from hoursThisLevel.txt
+        try (BufferedReader hoursThisLevelReader = new BufferedReader(new FileReader("hoursThisLevel.txt"))) {
+
+            //variables for looping
+            String hoursThisLevelIterator;
+            String hoursThisLevelString = null;
+
+            //update string value until last line (when null is achieved)
+            while ((hoursThisLevelIterator = hoursThisLevelReader.readLine()) != null) { //update until null
+                hoursThisLevelString = hoursThisLevelIterator;
+            }
+
+            //convert the last line into int value for totalHours
+            hoursThisLevel = Double.parseDouble(hoursThisLevelString);
+
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace(); // Handle any errors (file not found, invalid number)
+        }
+
+
+
+        //need for initial value
         hoursToNextLevel = multiplier * Math.log(level + 1);
 
         //capture additional hours
         System.out.print("input hours: ");
         inputHours = sc.nextDouble();
+
         //add to hours this level
         hoursThisLevel += inputHours;
+        hoursThisLevelWriter.printf("%.2f\n", hoursThisLevel); //print to 2 dec
+        hoursThisLevelWriter.flush(); //flush so can use later
+
         //add to total count
         totalHours += inputHours;
         //add to total hours file
-        totalHoursWriter.println(totalHours);
-        totalHoursWriter.close();
+        totalHoursWriter.printf("%.2f\n", totalHours); //print to 2 dec
+        totalHoursWriter.close(); //done for runtime
 
 
-        //level up decision structure
+        //level up structure
         while (hoursThisLevel >= hoursToNextLevel) {
             level++;
             levelWriter.println(level); //write into file
             levelWriter.close(); //close to take data out of buffer
-            hoursThisLevel -=  hoursToNextLevel;
-            System.out.printf("You have risen to %d\n", level);
-            hoursToNextLevel = multiplier * Math.log(level + 1);
+            hoursThisLevel -=  hoursToNextLevel; //reset hoursThisLevel
+            hoursThisLevelWriter.printf("%.2f\n", hoursThisLevel); //record in file
+            hoursThisLevelWriter.close(); //close to take out of buffer
+            System.out.printf("You have risen to %d\n", level); //print level up
+            hoursToNextLevel = multiplier * Math.log(level + 1); //holy formula for next level
         }
 
-        //report next milestone
+        //report next level up
         System.out.printf("%.1f hours needed to rise to level %d", hoursToNextLevel - hoursThisLevel, level + 1);
 
-
-        //write level, hoursToNext, totalHours to files
     }
 }
 
